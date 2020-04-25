@@ -83,6 +83,10 @@
         <div class="card-body">
             <a href="#confirmed">#</a>
             <canvas id="confirmed"></canvas>
+
+            <a href="#confirmed-per-million">#</a>
+            <canvas id="confirmed-per-million"></canvas>
+
             This is still pretty useless as the countries differ in total population and population density, lets
             turn to
             something
@@ -200,6 +204,17 @@
                 if (confirmed.length > labels.length) labels.push(labels.length)
             }
             days[country] = confirmed
+            return confirmed
+        }
+
+        function getDaysByMillion(data, country) {
+            var confirmed = []
+            for (var day of data[country]) {
+                if (beforeDayZero(day)) continue
+                confirmed.push(day["confirmed"] / (population[country] / 1e6))
+
+                if (confirmed.length > labels.length) labels.push(labels.length)
+            }
             return confirmed
         }
 
@@ -386,6 +401,13 @@
             cconfig.data.datasets = getDatasets(data, getDays, countries, false)
             cconfig.data.labels = labels
             makeChart("confirmed", cconfig)
+
+            var cconfig = JSON.parse(JSON.stringify(config))
+            cconfig.options.title.text = 'Corona infection confirmed by 100M people'
+            cconfig.options.scales.yAxes[0].scaleLabel.labelString = "confirmed per million"
+            cconfig.data.labels = labels
+            cconfig.data.datasets = getDatasets(data, getDaysByMillion, countries, false)
+            makeChart("confirmed-per-million", cconfig)
 
             cconfig = JSON.parse(JSON.stringify(config))
             cconfig.options.title.text = 'Corona infection rate comparison'
