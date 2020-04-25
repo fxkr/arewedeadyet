@@ -111,6 +111,9 @@
             <canvas id="tdoubling"></canvas>
             However, this representation is less numerically stable as it diverges to infinity as the infection rate
             approaches to 1.0.
+            <br/>
+            Same data, logarithmic:
+            <canvas id="tdoubling-log"></canvas>
         </div>
     </div>
     <div class="card mt-3">
@@ -426,6 +429,17 @@
             cconfig.data.datasets = getDatasets(data, getDoublingTime, countries, false)
             cconfig.data.labels = labels
             makeChart("tdoubling", cconfig)
+
+            cconfig = JSON.parse(JSON.stringify(config))
+            cconfig.options.title.text = 'Corona infection doubling time comparison'
+            cconfig.options.scales.yAxes[0].type = "logarithmic"
+            cconfig.options.scales.yAxes[0].scaleLabel.labelString = "days"
+            cconfig.options.scales.yAxes[0].ticks.min = 1
+            cconfig.options.scales.yAxes[0].ticks.max = 5000
+            cconfig.options.tooltips.position = "nearest"
+            cconfig.data.datasets = getDatasets(data, getDoublingTime, countries, false)
+            cconfig.data.labels = labels
+            makeChart("tdoubling-log", cconfig)
 
             cconfig = JSON.parse(JSON.stringify(config))
             cconfig.options.title.text = 'Corona fatality rate comparison'
