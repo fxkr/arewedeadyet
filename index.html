@@ -118,6 +118,12 @@
     </div>
     <div class="card mt-3">
         <div class="card-body">
+            Newly infected by day:
+            <canvas id="newlyInfected"></canvas>
+        </div>
+    </div>
+    <div class="card mt-3">
+        <div class="card-body">
             <a href="#fatality">#</a>
             However, <em>confirmed</em> does not mean the same between different countries and even in the same country
             at
@@ -249,6 +255,15 @@
                 dead.push(day["deaths"] / (population[country] / 1e6))
             }
             return dead
+        }
+
+        function getNewlyInfected(data, country) {
+            var confirmed = days[country]
+            var newInfected = []
+            for (var i = 1; i < confirmed.length; i++) {
+                newInfected.push((confirmed[i] - confirmed[i - 1]))
+            }
+            return newInfected;
         }
 
         function getRate(data, country) {
@@ -419,6 +434,13 @@
             cconfig.data.datasets = getDatasets(data, getRate, countries, false)
             cconfig.data.labels = labels
             makeChart("rate", cconfig)
+
+            cconfig = JSON.parse(JSON.stringify(config))
+            cconfig.options.title.text = 'Corona new infections by day'
+            cconfig.options.scales.yAxes[0].scaleLabel.labelString = "new infected today"
+            cconfig.data.datasets = getDatasets(data, getNewlyInfected, countries, false)
+            cconfig.data.labels = labels
+            makeChart("newlyInfected", cconfig)
 
             cconfig = JSON.parse(JSON.stringify(config))
             cconfig.options.title.text = 'Corona infection doubling time comparison'
