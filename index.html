@@ -184,6 +184,9 @@
             <strong>can
                 not</strong> assume that the epidemic is stopped due to the stochastic nature of the data.
             However, a rise of the graph after a decline can indicate that a second wave is coming.
+
+            <a href="#recovery-per-million">#</a>
+            <canvas id="recovery-per-million"></canvas>
         </div>
     </div>
     <hr>
@@ -235,6 +238,18 @@
                 if (day["recovered"])
                     last_valid_recovered = day["recovered"]
                 infected.push(day["confirmed"] - day["deaths"] - last_valid_recovered)
+            }
+            return infected
+        }
+
+        function getInfectedPerMillion(data, country) {
+            var infected = []
+            var last_valid_recovered = null // workaround data issue at JHU
+            for (var day of data[country]) {
+                if (beforeDayZero(day)) continue
+                if (day["recovered"])
+                    last_valid_recovered = day["recovered"]
+                infected.push((day["confirmed"] - day["deaths"] - last_valid_recovered) / (population[country] / 1e6))
             }
             return infected
         }
@@ -426,6 +441,13 @@
             cconfig.data.labels = labels
             cconfig.data.datasets = getDatasets(data, getDaysByMillion, countries, false)
             makeChart("confirmed-per-million", cconfig)
+
+            cconfig = JSON.parse(JSON.stringify(config))
+            cconfig.options.title.text = 'Corona infected comparison per million'
+            cconfig.options.scales.yAxes[0].scaleLabel.labelString = "confirmed - recovered - dead (per million)"
+            cconfig.data.datasets = getDatasets(data, getInfectedPerMillion, countries, false)
+            cconfig.data.labels = labels
+            makeChart("recovery-per-million", cconfig)
 
             cconfig = JSON.parse(JSON.stringify(config))
             cconfig.options.title.text = 'Corona infection rate comparison'
